@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Info, Clipboard, Check } from 'lucide-react';
 
-// Import the new input components
+// Ensure correct import paths (assuming components are in the same directory)
 import SingleCheckboxInput from './SingleCheckboxInput';
 import NumericInputLR from './NumericInputLR';
 import BeightonCheckboxLR from './BeightonCheckboxLR';
-import SingleValueDisplay from './SingleValueDisplay';
+import SingleValueDisplay from './SingleValueDisplay'; // Corrected import name if it was different
 
 const KneeMeasurementInterface = () => {
   const [copied, setCopied] = useState(false);
-  // Simplified state for single checkboxes
+  // State remains the same as the previous corrected version
   const [measurements, setMeasurements] = useState({
     mri: false,
     xrayEOS: false,
@@ -36,7 +36,7 @@ const KneeMeasurementInterface = () => {
   const [legLengthDifference, setLegLengthDifference] = useState('');
   const [beightonTotalScore, setBeightonTotalScore] = useState(0);
 
-  // --- Tooltips (Same as previous response - keep refined ones) ---
+  // Tooltips, NormalRanges, RangeLabels remain the same
    const tooltips = {
     mri: "MRI: Check if Magnetic Resonance Imaging was performed. Used for soft tissue detail (cartilage, ligaments like MPFL) and specific indices (e.g., Patella-Trochlea Index).",
     xrayEOS: "X-Ray/EOS: Check if standard Radiography or EOS (low-dose, standing) was performed. Used for bone morphology, overall alignment (valgus/varus), and height indices (Caton-Deschamps, Insall-Salvati).",
@@ -61,9 +61,6 @@ const KneeMeasurementInterface = () => {
     beightonKnee: "Beighton - Knee: Hyperextension >10° (1pt/side).",
     beightonTrunk: "Beighton - Trunk: Palms flat on floor, knees straight (1pt)."
   };
-
-
-  // --- Normal Ranges (Same as previous response) ---
    const normalRanges = {
     femoralTorsion: { low: 5, high: 25 },
     tibialTorsion: { low: 10, high: 40 },
@@ -78,13 +75,11 @@ const KneeMeasurementInterface = () => {
     genuValgum: { low: 0, high: 7 },
     beightonTotalScore: { low: 0, high: 4 }
   };
-
-  // --- Display Labels (Updated for Leg Length Diff) ---
   const rangeLabels = {
     femoralTorsion: "~10-25° (Path >25-30°)",
     tibialTorsion: "Varies (Path >40°)",
-    legLength: "N/A", // Label for input section
-    legLengthDifference: "N/A", // Label for calculated display
+    legLength: "N/A",
+    legLengthDifference: "N/A",
     patellaHeightInsallSalvati: "0.8-1.2",
     catonDeschampsIndex: "0.6-1.2 (Alta >1.3)",
     patellaTrochleaIndex: "≥12.5%",
@@ -97,7 +92,7 @@ const KneeMeasurementInterface = () => {
     beightonTotalScore: "Score /9 (Hyper ≥5)"
   };
 
-  // --- Calculations ---
+  // Calculations useEffects (Same as previous)
   useEffect(() => {
     const rightLen = parseFloat(measurements.legLength.right);
     const leftLen = parseFloat(measurements.legLength.left);
@@ -122,19 +117,16 @@ const KneeMeasurementInterface = () => {
     setBeightonTotalScore(score);
   }, [measurements.beightonPinky, measurements.beightonThumb, measurements.beightonElbow, measurements.beightonKnee, measurements.beightonTrunk]);
 
-  // --- Input Handling ---
+  // Input Handling (Same as previous, confirmed correct logic for single bools)
   const handleInputChange = (param, side, value) => {
-    // Handle single value for trunk flexion
     if (param === 'beightonTrunk') {
       setMeasurements(prev => ({ ...prev, beightonTrunk: { value: value } }));
       return;
     }
-    // Handle single checkboxes for imaging
     if (param === 'mri' || param === 'xrayEOS' || param === 'ctPerformed') {
       setMeasurements(prev => ({ ...prev, [param]: value }));
       return;
     }
-    // Handle other parameters with left/right sides
     setMeasurements(prev => ({
       ...prev,
       [param]: {
@@ -144,38 +136,35 @@ const KneeMeasurementInterface = () => {
     }));
   };
 
-  // --- Status & Color Logic (Same as previous) ---
+  // Status & Color Logic (Same as previous)
    const getRangeStatus = (value, type) => {
     if (value === '' || value === null || !normalRanges[type]) return 'neutral';
     const num = parseFloat(value);
     if (isNaN(num)) return 'neutral';
-
     const range = normalRanges[type];
     if (type === 'patellaTrochleaIndex') {
         return num >= range.low ? 'normal' : 'low';
     }
     if (type === 'beightonTotalScore') {
-        return num <= range.high ? 'normal' : 'high'; // ≥5 is hypermobile/abnormal
+        return num <= range.high ? 'normal' : 'high';
     }
     if (num < range.low) return 'low';
     if (num > range.high) return 'high';
     return 'normal';
   };
-
   const getStatusColor = (status) => {
     const colors = {
-      low: 'border-amber-500/60 text-amber-400', // Adjusted border intensity
+      low: 'border-amber-500/60 text-amber-400',
       high: 'border-rose-500/60 text-rose-400',
       normal: 'border-emerald-500/60 text-emerald-400',
       neutral: 'border-slate-600'
     };
-    // Use text color for highlighting numbers, border for container
     return colors[status] || colors.neutral;
   };
 
-  // --- Copy to Clipboard (Filtered Output) ---
+  // Copy to Clipboard (Same filtered logic as previous)
   const copyToClipboard = () => {
-    const allParameters = [
+     const allParameters = [
         { key: 'mri', label: 'MRI Performed', type: 'bool' },
         { key: 'xrayEOS', label: 'X-Ray/EOS Performed', type: 'bool' },
         { key: 'ctPerformed', label: 'CT Performed', type: 'bool' },
@@ -194,53 +183,44 @@ const KneeMeasurementInterface = () => {
         { key: 'genuValgum', label: 'Genu Valgum (°)', unit: '°', type: 'num_lr' },
         { key: 'beightonTotalScore', label: 'Beighton Score', unit: '/9', type: 'calc_single', value: beightonTotalScore },
     ];
-
-    // Filter parameters based on entered data
     const includedParameters = allParameters.filter(p => {
       if (p.type === 'bool') return measurements[p.key] === true;
       if (p.type === 'num_lr') return measurements[p.key]?.right !== '' || measurements[p.key]?.left !== '';
-      if (p.type === 'calc_single') return p.value !== '' && p.value !== 0; // Include calc if non-empty/non-zero
+      if (p.type === 'calc_single') return p.value !== '' && parseFloat(p.value) !== 0; // Include calc if non-empty/non-zero
       return false;
     });
-
      if (includedParameters.length === 0) {
         alert("No data entered to copy.");
         return;
     }
-
     const rows = [
       ['Parameter', 'Rechts', 'Links', 'Referenzbereich']
     ];
-
     includedParameters.forEach(({ key, label, unit, type, value }) => {
         const rightVal = measurements[key]?.right;
         const leftVal = measurements[key]?.left;
         const ref = rangeLabels[key] || '-';
         let rightDisplay = '-';
         let leftDisplay = '-';
-
         if (type === 'bool') {
-            rightDisplay = measurements[key] ? 'Ja' : 'Nein';
-            leftDisplay = ''; // Single value boolean
+            rightDisplay = measurements[key] ? 'Ja' : 'Nein'; // Use direct boolean state
+            leftDisplay = '';
         } else if (type === 'calc_single') {
             rightDisplay = value !== '' ? `${value}${unit || ''}` : '-';
-            leftDisplay = ''; // Single calculated value
+            leftDisplay = '';
         } else { // type 'num_lr'
-            rightDisplay = (rightVal !== '' && rightVal !== undefined) ? `${rightVal}${unit || ''}` : '-';
-            leftDisplay = (leftVal !== '' && leftVal !== undefined) ? `${leftVal}${unit || ''}` : '-';
+            rightDisplay = (rightVal !== '' && rightVal !== undefined && rightVal !== null) ? `${rightVal}${unit || ''}` : '-';
+            leftDisplay = (leftVal !== '' && leftVal !== undefined && leftVal !== null) ? `${leftVal}${unit || ''}` : '-';
         }
-
         rows.push([label, rightDisplay, leftDisplay, ref]);
     });
-
-    // --- HTML & Text Table Generation (Same as before) ---
+    // HTML & Text Table Generation
     let htmlTable = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; font-family: sans-serif; border: 1px solid #ddd;">';
     htmlTable += '<thead><tr>';
     rows[0].forEach(header => {
       htmlTable += `<th style="background-color: #f2f2f2; font-weight: bold; padding: 8px; border: 1px solid #ddd; text-align: left;">${header}</th>`;
     });
     htmlTable += '</tr></thead><tbody>';
-
     for (let i = 1; i < rows.length; i++) {
       htmlTable += '<tr>';
       rows[i].forEach((cell, index) => {
@@ -253,48 +233,30 @@ const KneeMeasurementInterface = () => {
       htmlTable += '</tr>';
     }
     htmlTable += '</tbody></table>';
-
     let plainText = '';
     rows.forEach(row => {
         plainText += row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join('\t') + '\n';
     });
-
-    // --- Clipboard API Call (Same as before) ---
+    // Clipboard API Call
     try {
         const blobHtml = new Blob([htmlTable], { type: 'text/html' });
         const blobText = new Blob([plainText], { type: 'text/plain' });
         const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
-
         navigator.clipboard.write(data).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        }).catch(err => {
-             console.error('Async: Could not copy text: ', err);
-             fallbackCopyTextToClipboard(plainText);
-        });
-    } catch (err) {
-        console.error('Could not copy text: ', err);
-        fallbackCopyTextToClipboard(plainText);
-    }
+        }).catch(err => { fallbackCopyTextToClipboard(plainText); });
+    } catch (err) { fallbackCopyTextToClipboard(plainText); }
   };
-
-  // Fallback copy function (Same as before)
-  const fallbackCopyTextToClipboard = (text) => {
+  const fallbackCopyTextToClipboard = (text) => { /* ... same fallback ... */
     const textArea = document.createElement('textarea');
     textArea.value = text;
-    textArea.style.position = 'fixed';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
+    textArea.style.position = 'fixed'; document.body.appendChild(textArea);
+    textArea.focus(); textArea.select();
+    try { document.execCommand('copy'); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    catch (err) { console.error('Fallback: Oops, unable to copy', err); }
     document.body.removeChild(textArea);
-  };
+   };
 
 
   // --- Full Parameter List for Live Summary Table ---
@@ -320,210 +282,96 @@ const KneeMeasurementInterface = () => {
 
   // --- JSX Structure ---
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-slate-100 p-4 md:p-6 lg:p-8">
-      {/* Responsive Container */}
-      <div className="max-w-7xl mx-auto bg-slate-800/50 rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto bg-slate-800/70 rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden backdrop-blur-sm">
 
-        {/* Header: Responsive adjustments */}
+        {/* Header */}
         <div className="p-4 md:p-6 bg-slate-900/70 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
            <div className="flex-grow">
-             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">Knee Radiographic & Clinical Parameters</h1>
+             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-tight">Knee Radiographic & Clinical Parameters</h1>
              <p className="text-xs md:text-sm text-slate-400 mt-1">Enter values below. Fields highlight based on typical ranges.</p>
            </div>
            <button
             onClick={copyToClipboard}
-            className="flex-shrink-0 flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors shadow-md disabled:opacity-50 text-sm md:text-base"
+            className="flex-shrink-0 flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 text-sm md:text-base font-medium"
             disabled={copied}
           >
-            {copied ? <Check size={18} /> : <Clipboard size={18} />}
+            {copied ? <Check size={18} className="animate-pulse" /> : <Clipboard size={18} />}
             {copied ? 'Copied!' : 'Copy Filtered Summary'}
           </button>
         </div>
 
-        {/* Main Content Grid: Responsive adjustments */}
+        {/* Main Content Grid */}
         <div className="p-4 md:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
           {/* Left Column */}
           <div className="space-y-6">
             {/* Imaging */}
-            <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Imaging</h2>
-              {/* Using the new component */}
-              <SingleCheckboxInput
-                id="mri"
-                label="MRI Performed"
-                tooltip={tooltips.mri}
-                checked={measurements.mri}
-                onChange={(e) => handleInputChange('mri', null, e.target.checked)}
-              />
-              <SingleCheckboxInput
-                id="xrayEOS"
-                label="X-Ray/EOS Performed"
-                tooltip={tooltips.xrayEOS}
-                checked={measurements.xrayEOS}
-                onChange={(e) => handleInputChange('xrayEOS', null, e.target.checked)}
-               />
-               <SingleCheckboxInput
-                 id="ctPerformed"
-                 label="CT Performed"
-                 tooltip={tooltips.ctPerformed}
-                 checked={measurements.ctPerformed}
-                 onChange={(e) => handleInputChange('ctPerformed', null, e.target.checked)}
-                />
+            <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Imaging</h2>
+              <SingleCheckboxInput id="mri" label="MRI Performed" tooltip={tooltips.mri} checked={measurements.mri} onChange={(e) => handleInputChange('mri', null, e.target.checked)} />
+              <SingleCheckboxInput id="xrayEOS" label="X-Ray/EOS Performed" tooltip={tooltips.xrayEOS} checked={measurements.xrayEOS} onChange={(e) => handleInputChange('xrayEOS', null, e.target.checked)} />
+              <SingleCheckboxInput id="ctPerformed" label="CT Performed" tooltip={tooltips.ctPerformed} checked={measurements.ctPerformed} onChange={(e) => handleInputChange('ctPerformed', null, e.target.checked)} />
             </section>
 
             {/* Torsion & Length */}
-            <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Torsion & Length</h2>
-              <NumericInputLR
-                  param="femoralTorsion" label="Femoral Torsion" unit="°"
-                  tooltip={tooltips.femoralTorsion} rangeLabel={rangeLabels.femoralTorsion}
-                  valueRight={measurements.femoralTorsion.right} valueLeft={measurements.femoralTorsion.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-              />
-               <NumericInputLR
-                  param="tibialTorsion" label="Tibial Torsion" unit="°"
-                  tooltip={tooltips.tibialTorsion} rangeLabel={rangeLabels.tibialTorsion}
-                  valueRight={measurements.tibialTorsion.right} valueLeft={measurements.tibialTorsion.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-              />
-               <NumericInputLR
-                  param="legLength" label="Leg Length" unit="mm"
-                  tooltip={tooltips.legLength} rangeLabel={rangeLabels.legLength}
-                  valueRight={measurements.legLength.right} valueLeft={measurements.legLength.left}
-                  onChange={handleInputChange} // Pass only necessary props
-               />
-               {/* Display Calculated Difference */}
-               <SingleValueDisplay
-                  param="legLengthDifference" label="Leg Length Diff (R-L)" unit="mm"
-                  tooltip={tooltips.legLengthDifference} value={legLengthDifference}
-               />
+            <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Torsion & Length</h2>
+              <NumericInputLR param="femoralTorsion" label="Femoral Torsion" unit="°" tooltip={tooltips.femoralTorsion} rangeLabel={rangeLabels.femoralTorsion} valueRight={measurements.femoralTorsion.right} valueLeft={measurements.femoralTorsion.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="tibialTorsion" label="Tibial Torsion" unit="°" tooltip={tooltips.tibialTorsion} rangeLabel={rangeLabels.tibialTorsion} valueRight={measurements.tibialTorsion.right} valueLeft={measurements.tibialTorsion.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="legLength" label="Leg Length" unit="mm" tooltip={tooltips.legLength} rangeLabel={rangeLabels.legLength} valueRight={measurements.legLength.right} valueLeft={measurements.legLength.left} onChange={handleInputChange} getStatusColor={() => 'border-slate-600'} getRangeStatus={() => 'neutral'} /* No specific range */ />
+              <SingleValueDisplay param="legLengthDifference" label="Leg Length Diff (R-L)" unit="mm" tooltip={tooltips.legLengthDifference} value={legLengthDifference} />
             </section>
 
-            {/* Other */}
-            <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Alignment</h2>
-               <NumericInputLR
-                  param="genuValgum" label="Genu Valgum" unit="°"
-                  tooltip={tooltips.genuValgum} rangeLabel={rangeLabels.genuValgum}
-                  valueRight={measurements.genuValgum.right} valueLeft={measurements.genuValgum.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-              />
+            {/* Alignment */}
+             <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Alignment</h2>
+               <NumericInputLR param="genuValgum" label="Genu Valgum" unit="°" tooltip={tooltips.genuValgum} rangeLabel={rangeLabels.genuValgum} valueRight={measurements.genuValgum.right} valueLeft={measurements.genuValgum.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
             </section>
+
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Patella Height */}
-             <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-               <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Patella Height</h2>
-                <NumericInputLR
-                  param="patellaHeightInsallSalvati" label="Insall-Salvati Index" unit=""
-                  tooltip={tooltips.patellaHeightInsallSalvati} rangeLabel={rangeLabels.patellaHeightInsallSalvati}
-                  valueRight={measurements.patellaHeightInsallSalvati.right} valueLeft={measurements.patellaHeightInsallSalvati.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                />
-                 <NumericInputLR
-                  param="catonDeschampsIndex" label="Caton-Deschamps Index" unit=""
-                  tooltip={tooltips.catonDeschampsIndex} rangeLabel={rangeLabels.catonDeschampsIndex}
-                  valueRight={measurements.catonDeschampsIndex.right} valueLeft={measurements.catonDeschampsIndex.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                />
-                 <NumericInputLR
-                  param="patellaTrochleaIndex" label="Patella-Trochlea Index (PTI)" unit="%"
-                  tooltip={tooltips.patellaTrochleaIndex} rangeLabel={rangeLabels.patellaTrochleaIndex}
-                  valueRight={measurements.patellaTrochleaIndex.right} valueLeft={measurements.patellaTrochleaIndex.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                />
+             {/* Patella Height */}
+             <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+               <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Patella Height</h2>
+               <NumericInputLR param="patellaHeightInsallSalvati" label="Insall-Salvati Index" unit="" tooltip={tooltips.patellaHeightInsallSalvati} rangeLabel={rangeLabels.patellaHeightInsallSalvati} valueRight={measurements.patellaHeightInsallSalvati.right} valueLeft={measurements.patellaHeightInsallSalvati.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+               <NumericInputLR param="catonDeschampsIndex" label="Caton-Deschamps Index" unit="" tooltip={tooltips.catonDeschampsIndex} rangeLabel={rangeLabels.catonDeschampsIndex} valueRight={measurements.catonDeschampsIndex.right} valueLeft={measurements.catonDeschampsIndex.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+               <NumericInputLR param="patellaTrochleaIndex" label="Patella-Trochlea Index (PTI)" unit="%" tooltip={tooltips.patellaTrochleaIndex} rangeLabel={rangeLabels.patellaTrochleaIndex} valueRight={measurements.patellaTrochleaIndex.right} valueLeft={measurements.patellaTrochleaIndex.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
              </section>
 
             {/* Patellar Alignment */}
-            <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Patellar Alignment</h2>
-                <NumericInputLR
-                  param="tttgDistanceCT" label="TT-TG Distance (CT)" unit="mm"
-                  tooltip={tooltips.tttgDistanceCT} rangeLabel={rangeLabels.tttgDistanceCT}
-                  valueRight={measurements.tttgDistanceCT.right} valueLeft={measurements.tttgDistanceCT.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                />
-                <NumericInputLR
-                  param="tttgDistanceMRI" label="TT-TG Distance (MRI)" unit="mm"
-                  tooltip={tooltips.tttgDistanceMRI} rangeLabel={rangeLabels.tttgDistanceMRI}
-                  valueRight={measurements.tttgDistanceMRI.right} valueLeft={measurements.tttgDistanceMRI.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                />
-                <NumericInputLR
-                  param="tttgIndex" label="TT-TG Index" unit=""
-                  tooltip={tooltips.tttgIndex} rangeLabel={rangeLabels.tttgIndex}
-                  valueRight={measurements.tttgIndex.right} valueLeft={measurements.tttgIndex.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                 />
-                 <NumericInputLR
-                  param="ttpclDistance" label="TT-PCL Distance" unit="mm"
-                  tooltip={tooltips.ttpclDistance} rangeLabel={rangeLabels.ttpclDistance}
-                  valueRight={measurements.ttpclDistance.right} valueLeft={measurements.ttpclDistance.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                 />
-                 <NumericInputLR
-                  param="patellaTilt" label="Patella Tilt" unit="°"
-                  tooltip={tooltips.patellaTilt} rangeLabel={rangeLabels.patellaTilt}
-                  valueRight={measurements.patellaTilt.right} valueLeft={measurements.patellaTilt.left}
-                  onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                 />
+            <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Patellar Alignment</h2>
+              <NumericInputLR param="tttgDistanceCT" label="TT-TG Distance (CT)" unit="mm" tooltip={tooltips.tttgDistanceCT} rangeLabel={rangeLabels.tttgDistanceCT} valueRight={measurements.tttgDistanceCT.right} valueLeft={measurements.tttgDistanceCT.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="tttgDistanceMRI" label="TT-TG Distance (MRI)" unit="mm" tooltip={tooltips.tttgDistanceMRI} rangeLabel={rangeLabels.tttgDistanceMRI} valueRight={measurements.tttgDistanceMRI.right} valueLeft={measurements.tttgDistanceMRI.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="tttgIndex" label="TT-TG Index" unit="" tooltip={tooltips.tttgIndex} rangeLabel={rangeLabels.tttgIndex} valueRight={measurements.tttgIndex.right} valueLeft={measurements.tttgIndex.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="ttpclDistance" label="TT-PCL Distance" unit="mm" tooltip={tooltips.ttpclDistance} rangeLabel={rangeLabels.ttpclDistance} valueRight={measurements.ttpclDistance.right} valueLeft={measurements.ttpclDistance.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
+              <NumericInputLR param="patellaTilt" label="Patella Tilt" unit="°" tooltip={tooltips.patellaTilt} rangeLabel={rangeLabels.patellaTilt} valueRight={measurements.patellaTilt.right} valueLeft={measurements.patellaTilt.left} onChange={handleInputChange} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} />
             </section>
 
              {/* Beighton Score */}
-            <section className="p-4 md:p-5 bg-slate-800/60 rounded-lg border border-slate-700">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2">Beighton Hypermobility</h2>
-               <BeightonCheckboxLR
-                  param="beightonPinky" label="Pinky >90°" tooltip={tooltips.beightonPinky}
-                  checkedRight={measurements.beightonPinky.right} checkedLeft={measurements.beightonPinky.left}
-                  onChange={handleInputChange}
-                />
-                <BeightonCheckboxLR
-                  param="beightonThumb" label="Thumb to Forearm" tooltip={tooltips.beightonThumb}
-                  checkedRight={measurements.beightonThumb.right} checkedLeft={measurements.beightonThumb.left}
-                  onChange={handleInputChange}
-                 />
-                 <BeightonCheckboxLR
-                  param="beightonElbow" label="Elbow Hyperext. >10°" tooltip={tooltips.beightonElbow}
-                  checkedRight={measurements.beightonElbow.right} checkedLeft={measurements.beightonElbow.left}
-                  onChange={handleInputChange}
-                 />
-                  <BeightonCheckboxLR
-                  param="beightonKnee" label="Knee Hyperext. >10°" tooltip={tooltips.beightonKnee}
-                  checkedRight={measurements.beightonKnee.right} checkedLeft={measurements.beightonKnee.left}
-                  onChange={handleInputChange}
-                 />
-                 {/* Single Checkbox for Trunk */}
-                 <div className="mt-2">
-                    <SingleCheckboxInput
-                        id="beightonTrunk" label="Trunk Flexion (Palms Flat)"
-                        tooltip={tooltips.beightonTrunk}
-                        checked={measurements.beightonTrunk.value}
-                        onChange={(e) => handleInputChange('beightonTrunk', null, e.target.checked)}
-                    />
-                 </div>
-
-               <div className="mt-4">
-                 <SingleValueDisplay
-                   param="beightonTotalScore" label="Total Beighton Score" unit="/9"
-                   tooltip={tooltips.beightonTotalScore} rangeLabel={rangeLabels.beightonTotalScore}
-                   value={beightonTotalScore} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus}
-                 />
-               </div>
+            <section className="p-4 md:p-5 bg-slate-800/40 rounded-lg border border-slate-700/50 shadow-inner">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 border-b border-slate-600 pb-2 text-slate-100">Beighton Hypermobility</h2>
+               <BeightonCheckboxLR param="beightonPinky" label="Pinky >90°" tooltip={tooltips.beightonPinky} checkedRight={measurements.beightonPinky.right} checkedLeft={measurements.beightonPinky.left} onChange={handleInputChange} />
+               <BeightonCheckboxLR param="beightonThumb" label="Thumb to Forearm" tooltip={tooltips.beightonThumb} checkedRight={measurements.beightonThumb.right} checkedLeft={measurements.beightonThumb.left} onChange={handleInputChange} />
+               <BeightonCheckboxLR param="beightonElbow" label="Elbow Hyperext. >10°" tooltip={tooltips.beightonElbow} checkedRight={measurements.beightonElbow.right} checkedLeft={measurements.beightonElbow.left} onChange={handleInputChange} />
+               <BeightonCheckboxLR param="beightonKnee" label="Knee Hyperext. >10°" tooltip={tooltips.beightonKnee} checkedRight={measurements.beightonKnee.right} checkedLeft={measurements.beightonKnee.left} onChange={handleInputChange} />
+               <div className="mt-2"> <SingleCheckboxInput id="beightonTrunk" label="Trunk Flexion (Palms Flat)" tooltip={tooltips.beightonTrunk} checked={measurements.beightonTrunk.value} onChange={(e) => handleInputChange('beightonTrunk', null, e.target.checked)} /> </div>
+               <div className="mt-4"> <SingleValueDisplay param="beightonTotalScore" label="Total Beighton Score" unit="/9" tooltip={tooltips.beightonTotalScore} rangeLabel={rangeLabels.beightonTotalScore} value={beightonTotalScore} getStatusColor={getStatusColor} getRangeStatus={getRangeStatus} /> </div>
             </section>
 
           </div>
         </div>
 
-         {/* Live Summary Table - No fixed height */}
+         {/* Live Summary Table - No fixed height, allows horizontal scroll */}
          <div className="p-4 md:p-6 lg:p-8 border-t border-slate-700">
-            <h2 className="text-lg md:text-xl font-semibold mb-4">Live Summary Table</h2>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-slate-100">Live Summary Table</h2>
             {/* Wrapper allows horizontal scroll on small screens */}
-            <div className="overflow-x-auto rounded-lg border border-slate-700 ">
-               <table className="w-full text-sm min-w-[600px]"> {/* Min-width helps table layout */}
-                  <thead className="bg-slate-700/50 sticky top-0 z-10"> {/* Sticky header */}
+            <div className="overflow-x-auto rounded-lg border border-slate-700 shadow-md">
+               <table className="w-full text-sm min-w-[700px]"> {/* Min-width helps table layout */}
+                  <thead className="bg-slate-700/50 text-slate-300 uppercase tracking-wider">
                      <tr>
                         <th className="text-left p-3 font-semibold whitespace-nowrap">Parameter</th>
                         <th className="text-center p-3 font-semibold whitespace-nowrap">Rechts</th>
@@ -532,47 +380,47 @@ const KneeMeasurementInterface = () => {
                      </tr>
                   </thead>
                   <tbody className="bg-slate-800/50">
-                     {/* Use the full list of parameters for the live table */}
                      {summaryTableParameters.map(({ key, label, unit, type, value: calculatedValue }) => {
-                        // Determine Right/Left values based on type
-                        let rightVal, leftVal;
-                        if (type === 'bool') {
-                            rightVal = measurements[key]; // Direct boolean value
-                            leftVal = null; // No left value for single bool
-                        } else if (type === 'calc_single') {
-                            rightVal = calculatedValue; // Use calculated value
-                            leftVal = null; // No left value for calculated single
-                        } else { // Assumes type === 'num_lr'
-                            rightVal = measurements[key]?.right;
-                            leftVal = measurements[key]?.left;
-                        }
+                        // Simplified logic for getting values for display
+                        let rightValState = measurements[key]?.right;
+                        let leftValState = measurements[key]?.left;
+                        let singleValState = measurements[key]; // For bools and single value calc
 
-                        const ref = rangeLabels[key] || '-';
                         let rightDisplay = '-';
                         let leftDisplay = '-';
+                        let valueForColoringRight = null;
+                        let valueForColoringLeft = null;
 
-                         if (type === 'bool') {
-                             rightDisplay = rightVal ? 'Ja' : 'Nein';
-                             leftDisplay = ''; // Display nothing for left side
-                         } else if (type === 'calc_single') {
-                             rightDisplay = (rightVal !== '' && rightVal !== null && rightVal !== undefined) ? `${rightVal}${unit || ''}` : '-';
-                             leftDisplay = ''; // Display nothing for left side
-                         } else { // type 'num_lr'
-                            rightDisplay = (rightVal !== '' && rightVal !== null && rightVal !== undefined) ? `${rightVal}${unit || ''}` : '-';
-                            leftDisplay = (leftVal !== '' && leftVal !== null && leftVal !== undefined) ? `${leftVal}${unit || ''}` : '-';
+                        if (type === 'bool') {
+                            rightDisplay = singleValState ? 'Ja' : 'Nein';
+                            leftDisplay = '';
+                        } else if (type === 'calc_single') {
+                            rightDisplay = calculatedValue !== '' ? `${calculatedValue}${unit || ''}` : '-';
+                            leftDisplay = '';
+                            valueForColoringRight = calculatedValue; // Use calculated value for coloring
+                        } else { // num_lr
+                            rightDisplay = (rightValState !== '' && rightValState !== undefined && rightValState !== null) ? `${rightValState}${unit || ''}` : '-';
+                            leftDisplay = (leftValState !== '' && leftValState !== undefined && leftValState !== null) ? `${leftValState}${unit || ''}` : '-';
+                            valueForColoringRight = rightValState;
+                            valueForColoringLeft = leftValState;
+                        }
+
+                         // Override display for Leg Length for clarity
+                         if (key === 'legLength') {
+                             rightDisplay = measurements.legLength.right || '-';
+                             leftDisplay = measurements.legLength.left || '-';
                          }
 
                         return (
-                           <tr key={key} className="border-b border-slate-700 last:border-b-0 hover:bg-slate-700/30">
-                              <td className="p-3 font-medium whitespace-nowrap">{label}</td>
-                              {/* Apply color only if it's numeric/calculable */}
-                              <td className={`text-center p-3 whitespace-nowrap ${type !== 'bool' ? getStatusColor(getRangeStatus(rightVal, key)) : ''}`}>
+                           <tr key={key} className="border-b border-slate-700 last:border-b-0 hover:bg-slate-700/30 transition-colors duration-150">
+                              <td className="p-3 font-medium whitespace-nowrap text-slate-200">{label}</td>
+                              <td className={`text-center p-3 whitespace-nowrap ${type !== 'bool' ? getStatusColor(getRangeStatus(valueForColoringRight, key)) : ''}`}>
                                 {rightDisplay}
                               </td>
-                               <td className={`text-center p-3 whitespace-nowrap ${type === 'num_lr' ? getStatusColor(getRangeStatus(leftVal, key)) : ''}`}>
+                              <td className={`text-center p-3 whitespace-nowrap ${type === 'num_lr' ? getStatusColor(getRangeStatus(valueForColoringLeft, key)) : ''}`}>
                                 {leftDisplay}
                               </td>
-                              <td className="text-center p-3 text-slate-400 whitespace-nowrap">{ref}</td>
+                              <td className="text-center p-3 text-slate-400 whitespace-nowrap">{rangeLabels[key] || '-'}</td>
                            </tr>
                         );
                      })}
